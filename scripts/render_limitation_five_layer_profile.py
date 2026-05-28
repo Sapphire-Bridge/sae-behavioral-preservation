@@ -333,7 +333,7 @@ def render_svg(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Render a five-layer draft profile from a comparability summary JSON.")
+    parser = argparse.ArgumentParser(description="Render the Appendix B five-layer profile from a comparability summary JSON.")
     parser.add_argument("--summary", type=Path, required=True, help="Path to the source comparability summary JSON.")
     parser.add_argument("--out_svg", type=Path, required=True, help="Output SVG path.")
     parser.add_argument("--out_csv", type=Path, default=None, help="Optional output CSV path with the plotted values.")
