@@ -1,7 +1,4 @@
-# Pinned runtime + dev dependencies for reproducible paper runs.
-#
-# For a fully locked environment snapshot (including transitive deps from the reference machine),
-# see `requirements.lock.txt`.
+# Minimal pinned runtime + test dependencies for reproducible paper runs.
 torch==2.5.1
 transformers==4.57.3
 tokenizers==0.22.1
