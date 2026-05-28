@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<line x1="80" y1="40" x2="80" y2="320" stroke="#222222" stroke-width="1"/>
+<line x1="80" y1="320" x2="660" y2="320" stroke="#222222" stroke-width="1"/>
+<line x1="80" y1="320.0" x2="660" y2="320.0" stroke="#aaaaaa" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="80.0" y="24.0" font-size="16" font-family="monospace" font-weight="bold">SAE writeback limitation: L4/L8 centerpiece</text>
+<text x="188.8" y="348.0" font-size="12" font-family="monospace" font-weight="bold">L4</text>
+<rect x="116.2" y="149.2" width="72.5" height="170.8" fill="#1f77b4"/>
+<line x1="152.5" y1="231.3" x2="152.5" y2="64.9" stroke="#111111" stroke-width="1.5"/>
+<line x1="120.2" y1="231.3" x2="184.8" y2="231.3" stroke="#111111" stroke-width="1.5"/>
+<line x1="120.2" y1="64.9" x2="184.8" y2="64.9" stroke="#111111" stroke-width="1.5"/>
+<rect x="203.2" y="213.9" width="72.5" height="106.1" fill="#d62728"/>
+<line x1="239.5" y1="287.4" x2="239.5" y2="142.7" stroke="#111111" stroke-width="1.5"/>
+<line x1="207.2" y1="287.4" x2="271.8" y2="287.4" stroke="#111111" stroke-width="1.5"/>
+<line x1="207.2" y1="142.7" x2="271.8" y2="142.7" stroke="#111111" stroke-width="1.5"/>
+<rect x="290.2" y="146.4" width="72.5" height="173.6" fill="#2ca02c"/>
+<line x1="326.5" y1="218.2" x2="326.5" y2="69.9" stroke="#111111" stroke-width="1.5"/>
+<line x1="294.2" y1="218.2" x2="358.8" y2="218.2" stroke="#111111" stroke-width="1.5"/>
+<line x1="294.2" y1="69.9" x2="358.8" y2="69.9" stroke="#111111" stroke-width="1.5"/>
+<text x="478.8" y="348.0" font-size="12" font-family="monospace" font-weight="bold">L8</text>
+<rect x="406.2" y="124.8" width="72.5" height="195.2" fill="#1f77b4"/>
+<line x1="442.5" y1="205.1" x2="442.5" y2="40.0" stroke="#111111" stroke-width="1.5"/>
+<line x1="410.2" y1="205.1" x2="474.8" y2="205.1" stroke="#111111" stroke-width="1.5"/>
+<line x1="410.2" y1="40.0" x2="474.8" y2="40.0" stroke="#111111" stroke-width="1.5"/>
+<rect x="493.2" y="129.9" width="72.5" height="190.1" fill="#d62728"/>
+<line x1="529.5" y1="197.3" x2="529.5" y2="55.6" stroke="#111111" stroke-width="1.5"/>
+<line x1="497.2" y1="197.3" x2="561.8" y2="197.3" stroke="#111111" stroke-width="1.5"/>
+<line x1="497.2" y1="55.6" x2="561.8" y2="55.6" stroke="#111111" stroke-width="1.5"/>
+<rect x="580.2" y="175.8" width="72.5" height="144.2" fill="#2ca02c"/>
+<line x1="616.5" y1="238.8" x2="616.5" y2="103.5" stroke="#111111" stroke-width="1.5"/>
+<line x1="584.2" y1="238.8" x2="648.8" y2="238.8" stroke="#111111" stroke-width="1.5"/>
+<line x1="584.2" y1="103.5" x2="648.8" y2="103.5" stroke="#111111" stroke-width="1.5"/>
+<rect x="80.0" y="368.0" width="14" height="14" fill="#1f77b4"/>
+<text x="102.0" y="380.0" font-size="11" font-family="monospace" font-weight="normal">raw effect</text>
+<rect x="230.0" y="368.0" width="14" height="14" fill="#d62728"/>
+<text x="252.0" y="380.0" font-size="11" font-family="monospace" font-weight="normal">sae effect</text>
+<rect x="380.0" y="368.0" width="14" height="14" fill="#2ca02c"/>
+<text x="402.0" y="380.0" font-size="11" font-family="monospace" font-weight="normal">pca effect</text>
+</svg>

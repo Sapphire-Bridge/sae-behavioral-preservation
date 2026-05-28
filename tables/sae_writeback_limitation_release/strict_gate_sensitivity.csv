@@ -1,0 +1,3 @@
+layer,n_rows_strict_gate,n_pairs_strict_gate,d_CA_mean,d_CA_ci_low,d_CA_ci_high,target_sign_flip_observed_mean,target_sign_flip_p_two_sided,target_sign_flip_n_units,target_sign_flip_n_permutations,target_sign_flip_permutation_mode,seed
+4,101,52,-0.21285667460411203,-0.465308659206371,0.03333810859281959,-0.21285667460411195,0.11669921875,13,8192,exact,42
+8,103,52,-0.05462515993360928,-0.3228711300359643,0.18854888646623255,-0.05462515993360928,0.666259765625,13,8192,exact,42

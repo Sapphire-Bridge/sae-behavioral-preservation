@@ -1,0 +1,136 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+PIPFILE.lock
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+nohup.out
+*.log
+
+# Large model weight bundles (CLT / SAE weights - not for VCS)
+clt_bundles/
+
+# Temporary working directory
+tmp/
+
+# Internal working notes
+notes/
+
+# AI-generated context docs (local tooling only)
+docs/context/
+
+# Generated figure outputs (reproduced by make limitation-reproduce)
+figures/*.pdf
+
+# Internal working docs (not part of the public supplement)
+docs/ARCHIVAL_RELEASE_MODEL.md
+docs/CLT_V1.md
+docs/MOM_ENDPOINT_EXECUTION_CHECKLIST.md
+docs/MOM_R1_TRUST_CHECKLIST.md
+docs/PUBLIC_ARTIFACT_FORMAT.md
+docs/RELEASE_CHECKLIST.md
+
+# Local smoke-run scratch outputs
+results/paper_smoke/
+
+# Embedded repo copies
+MoM/
+MoM_filtered/
+
+# Internal working history (not part of the public supplement)
+historical/
+
+# MoM-era result runs (not part of the SAE writeback limitation surface)
+results/mom_*/
+results/overnight_*/
+results/disamb_followups_*/
+results/paper_lock_*/
+results/safety_it*/
+
+# Safety evaluation data (not part of the public supplement)
+data/safety_*.jsonl
+
+# Experiment configuration files (internal tooling)
+configs/
+
+# MoM-era publication bundle outputs (from removed scripts)
+release_public/
+release_minimal_publish_bundle/
+replication_bundle/
+reviewer_check_logs/

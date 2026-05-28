@@ -1,0 +1,27 @@
+{
+  "bundle_id": "db5cb11757fce2cc6f803baedb11173c0ccee311c839fe8103cb4f974bcba0c6",
+  "disamb_mode": "hardened",
+  "files": {
+    "disamb_pairs.jsonl": {
+      "n_lines": 52,
+      "path": "data_paper_hardened_v2/disamb_pairs.jsonl",
+      "sha256": "a9587c185bde2ca83a1fd2d22a62d9d961b2105e7626117240e8aeff207adee1"
+    }
+  },
+  "generated_at_utc": "2026-02-06T13:30:38+00:00",
+  "generator": "scripts/generate_data.py",
+  "git_commit": "d23624b91854bb4aa266814b19aad6917eb3f691",
+  "name": "paper_hardened_v2",
+  "seed": 0,
+  "suite_counts": {
+    "disamb": {
+      "n_pairs_total": 52,
+      "pair_variant_counts": {
+        "clean": 13,
+        "distractor": 13,
+        "paraphrase_clean": 13,
+        "paraphrase_distractor": 13
+      }
+    }
+  }
+}

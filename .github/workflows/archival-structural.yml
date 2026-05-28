@@ -1,0 +1,22 @@
+name: limitation-check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  limitation-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Limitation number check
+        run: make limitation-number-check PYTHON=python3.11
+      - name: Limitation unit tests
+        run: make limitation-check PYTHON=python3.11

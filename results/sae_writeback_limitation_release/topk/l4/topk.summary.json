@@ -1,0 +1,65 @@
+{
+  "compact_topk_effects": {
+    "100": {
+      "ci_high": 0.5354269594864148,
+      "ci_low": 0.039836363495311194,
+      "mean": 0.2845384686327809
+    },
+    "20": {
+      "ci_high": 0.35517480794187384,
+      "ci_low": -0.021846007258452947,
+      "mean": 0.15602175806828134
+    },
+    "50": {
+      "ci_high": 0.40255930918170196,
+      "ci_low": -0.07611803146029503,
+      "mean": 0.1376165991323325
+    }
+  },
+  "concentration": {
+    "gini": 0.9692409412233218,
+    "mass_at_100": 0.42639872501246584,
+    "mass_at_20": 0.1822104799854982,
+    "mass_at_50": 0.3084705138625243
+  },
+  "counts": {
+    "n_eval_cases": 52,
+    "n_skipped_misaligned": 0,
+    "n_total_directions": 104
+  },
+  "dataset": {
+    "bundle_id": "db5cb11757fce2cc6f803baedb11173c0ccee311c839fe8103cb4f974bcba0c6",
+    "manifest_sha256": "81bc6129775ff29a650a1eebfbfe9dded6a3923e877b740fa744989440d564d0"
+  },
+  "execution_profile_id": "sae_writeback_limitation_v1",
+  "full_effect": {
+    "ci_high": 0.9837844528082008,
+    "ci_low": -0.01365773558165326,
+    "mean": 0.4957860315575974
+  },
+  "layer": 4,
+  "model": {
+    "id": "google/gemma-3-4b-pt",
+    "revision": "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+    "tokenizer_revision": "cc012e0a6d0787b4adcc0fa2c4da74402494554d"
+  },
+  "publication_profile": "sae_writeback_limitation",
+  "run": {
+    "bootstrap_n": 1000,
+    "ci": 0.95,
+    "frac_selection": 0.5,
+    "git_commit": "e633243a9abb72fad5c66a1cb7ee6d5493b3b7d2",
+    "seed": 0,
+    "source_schema_version": "topk_recovery_v1",
+    "split_seed": 0
+  },
+  "sae": {
+    "bundle_id": "c50c24b2b45322e28d2eae9f7f7cf82f55cb523653010d06977fde3b60a79f84",
+    "bundle_manifest_sha256": "03bff6c4498fdcb1b5298dbae7d95992a74f08ccbef5a155837108d7a9b04199"
+  },
+  "source_artifacts": {
+    "topk_summary": "results/sae_writeback_limitation_release/source/topk/gemma3_4b_topk.summary.json",
+    "topk_summary_sha256": "29e8bf9703fa357716b8e00f69260c0468249df065088d485cf155c0d3d6ed87"
+  },
+  "summary_schema_version": "sae_writeback_limitation_topk_v1"
+}

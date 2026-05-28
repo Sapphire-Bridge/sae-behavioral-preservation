@@ -1,0 +1,8 @@
+[allowlist]
+description = "Allow public provenance field names that gitleaks generic-api-key can misclassify."
+stopwords = [
+  "special_tokens_map.json",
+  "tokenizer.json",
+  "tokenizer_config.json",
+  "tokenizer_revision",
+]

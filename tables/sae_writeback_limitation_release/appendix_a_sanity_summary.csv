@@ -1,0 +1,11 @@
+key,value,scope,note
+l4_direction_a_to_b_sae_minus_raw,-0.435,L4,SAE-minus-raw by donor direction
+l4_direction_b_to_a_sae_minus_raw,-0.183,L4,SAE-minus-raw by donor direction
+baseline_near_zero_count,2,L4/L8,near-zero base margins among 104 directed rows
+baseline_near_zero_denominator,104,L4/L8,near-zero base margins denominator
+baseline_donor_consistent_count,7,L4/L8,already donor-consistent at baseline among 104 directed rows
+baseline_donor_consistent_denominator,104,L4/L8,donor-consistent denominator
+binary_logodds_l4_sae_minus_raw,-0.342,L4,auxiliary binary-logodds margin
+binary_logodds_l8_sae_minus_raw,-0.014,L8,auxiliary binary-logodds margin
+identity_fail_l4,0,L4,identity-control failures
+identity_fail_l8,0,L8,identity-control failures
