@@ -55,6 +55,7 @@ def collect_rows(summary: dict[str, Any], layers: list[int]) -> list[dict[str, A
             {
                 "layer": int(layer),
                 "fidelity_cosine": metric_triplet(entry, "fidelity_cosine"),
+                "fidelity_fvu": metric_triplet(entry, "fidelity_fvu"),
                 "raw_effect": metric_triplet(entry, "effect_A"),
                 "sae_effect": metric_triplet(entry, "effect_C"),
                 "sae_minus_raw": metric_triplet(entry, "d_CA"),
@@ -71,6 +72,9 @@ def write_csv(rows: list[dict[str, Any]], out_path: Path) -> None:
         "fidelity_cosine_mean",
         "fidelity_cosine_ci_low",
         "fidelity_cosine_ci_high",
+        "fidelity_fvu_mean",
+        "fidelity_fvu_ci_low",
+        "fidelity_fvu_ci_high",
         "raw_effect_mean",
         "raw_effect_ci_low",
         "raw_effect_ci_high",
@@ -94,6 +98,9 @@ def write_csv(rows: list[dict[str, Any]], out_path: Path) -> None:
                     "fidelity_cosine_mean": row["fidelity_cosine"]["mean"],
                     "fidelity_cosine_ci_low": row["fidelity_cosine"]["ci_low"],
                     "fidelity_cosine_ci_high": row["fidelity_cosine"]["ci_high"],
+                    "fidelity_fvu_mean": row["fidelity_fvu"]["mean"],
+                    "fidelity_fvu_ci_low": row["fidelity_fvu"]["ci_low"],
+                    "fidelity_fvu_ci_high": row["fidelity_fvu"]["ci_high"],
                     "raw_effect_mean": row["raw_effect"]["mean"],
                     "raw_effect_ci_low": row["raw_effect"]["ci_low"],
                     "raw_effect_ci_high": row["raw_effect"]["ci_high"],
@@ -341,7 +348,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--title",
         type=str,
-        default="Five-layer matched writeback profile",
+        default="Five-layer matched activation-patching profile",
         help="Figure title.",
     )
     parser.add_argument(

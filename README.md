@@ -1,23 +1,24 @@
-# Geometric Fidelity Is Not Behavioral Preservation
+# Geometric Fidelity Does Not Certify Behavioral Preservation
 
 **Paper:** [`paper/sae_writeback_limitation_short_paper.md`](paper/sae_writeback_limitation_short_paper.md)
 
 This repo accompanies a paper that asks a single question: if a sparse
-autoencoder reconstructs an activation near-perfectly in vector space, does it
+autoencoder reconstructs an activation with high fidelity in vector space, does it
 also preserve that activation's causal effect on model behavior?
 
 The main result is a layer-specific L4/L8 contrast. In Gemma 3 4B, layers 4
-and 8 have near-identical reconstruction fidelity, but very different behavioral
-recovery under matched SAE writeback:
+and 8 both show strong standard reconstruction diagnostics. FVU is lower at L8
+than at L4, but the two layers still show very different behavioral recovery
+under matched SAE reconstruction patching:
 
-| Layer | Cosine | RelMSE | CRR |
-|-------|-------:|-------:|----:|
-| L4 | 0.997 | 0.007 | **0.621** |
-| L8 | 0.998 | 0.007 | **0.974** |
+| Layer | Cosine | RelMSE | FVU | CRR |
+|-------|-------:|-------:|----:|----:|
+| L4 | 0.997 | 0.007 | 0.137 | **0.621** |
+| L8 | 0.998 | 0.007 | 0.060 | **0.974** |
 
-The point is not that SAEs fail in general. The point is that high cosine
-similarity and low reconstruction error do not by themselves certify behavior
-preservation under matched writeback at a given locus.
+The point is not that SAEs fail in general. The point is that standard
+reconstruction diagnostics do not by themselves certify behavior preservation
+under matched activation patching at a given layer-token intervention site.
 
 Scope is deliberately narrow: one model (Gemma 3 4B), one task (homonym
 disambiguation), 52 paired evaluation cases. The L4/L8 contrast is substantial
@@ -25,10 +26,10 @@ even within this controlled setting.
 
 <img
   src="figures/sae_writeback_limitation/main_effect_figure.svg"
-  alt="L4/L8 comparison showing near-identical reconstruction fidelity but different behavioral recovery under matched SAE writeback."
+  alt="L4/L8 comparison showing strong reconstruction diagnostics but different behavioral recovery under matched SAE reconstruction patching."
 />
 
-*Figure 1. Near-identical reconstruction fidelity at L4 and L8, but only L8 nearly preserves the raw writeback effect.*
+*Figure 1. L4 and L8 both show strong reconstruction diagnostics, with lower FVU at L8 than L4, but only L8 shows high recovery of the raw activation-patching effect.*
 
 ---
 
@@ -85,7 +86,7 @@ make limitation-one-result-gpu
 ```
 
 This is the accelerator-backed **layer-4 limitation quickcheck**. It runs a
-fresh L4 comparability check and verifies it against the checked-in public CPU
+fresh L4 comparability check and verifies it against the checked-in public
 reference.
 
 **Outputs:**

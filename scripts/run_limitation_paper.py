@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
+import threading
 from dataclasses import asdict
 from pathlib import Path
 
@@ -49,15 +51,82 @@ def _resolve_torch_dtype(configured: str | None, *, device: str) -> str | None:
     return None
 
 
+def _log_stem(name: str) -> str:
+    stem = re.sub(r"[^A-Za-z0-9]+", "_", str(name).strip().lower()).strip("_")
+    return stem or "command"
+
+
+def _relative_log_path(path: Path, run_root: Path) -> str:
+    try:
+        return f"$RUN_ROOT/{path.relative_to(run_root).as_posix()}"
+    except ValueError:
+        return str(path)
+
+
+def _tail_text_lines(path: Path, *, n: int = 40) -> tuple[str, ...]:
+    if not path.exists():
+        return ()
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return tuple(text.splitlines()[-int(n) :])
+
+
+def _tee_pipe(pipe, log_file, console_buffer) -> None:
+    try:
+        for chunk in iter(lambda: pipe.readline(), b""):
+            log_file.write(chunk)
+            log_file.flush()
+            if console_buffer is not None:
+                console_buffer.write(chunk)
+                console_buffer.flush()
+    finally:
+        pipe.close()
+
+
+def _run_subprocess_with_logs(spec: CommandSpec, *, cwd: Path, run_root: Path) -> tuple[int, Path, Path]:
+    logs_root = run_root / "logs"
+    logs_root.mkdir(parents=True, exist_ok=True)
+    stem = _log_stem(spec.name)
+    stdout_path = logs_root / f"{stem}.stdout.log"
+    stderr_path = logs_root / f"{stem}.stderr.log"
+    stdout_buffer = getattr(sys.stdout, "buffer", None)
+    stderr_buffer = getattr(sys.stderr, "buffer", None)
+    with stdout_path.open("wb") as stdout_file, stderr_path.open("wb") as stderr_file:
+        proc = subprocess.Popen(
+            spec.argv,
+            cwd=str(cwd),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert proc.stdout is not None
+        assert proc.stderr is not None
+        stdout_thread = threading.Thread(
+            target=_tee_pipe,
+            args=(proc.stdout, stdout_file, stdout_buffer),
+            daemon=True,
+        )
+        stderr_thread = threading.Thread(
+            target=_tee_pipe,
+            args=(proc.stderr, stderr_file, stderr_buffer),
+            daemon=True,
+        )
+        stdout_thread.start()
+        stderr_thread.start()
+        exit_code = int(proc.wait())
+        stdout_thread.join()
+        stderr_thread.join()
+    return exit_code, stdout_path, stderr_path
+
+
 def _run_one(spec: CommandSpec, *, cwd: Path, run_root: Path, dry_run: bool) -> CommandRecord:
     before = _walk_files(run_root)
     started = _utc_now_iso()
     exit_code = 0
+    stdout_path: Path | None = None
+    stderr_path: Path | None = None
     if dry_run:
         print(_display_command(spec.argv, run_root))
     else:
-        result = subprocess.run(spec.argv, cwd=str(cwd), check=False)
-        exit_code = int(result.returncode)
+        exit_code, stdout_path, stderr_path = _run_subprocess_with_logs(spec, cwd=cwd, run_root=run_root)
     ended = _utc_now_iso()
     after = _walk_files(run_root)
     generated = tuple(sorted(after - before))
@@ -70,6 +139,9 @@ def _run_one(spec: CommandSpec, *, cwd: Path, run_root: Path, dry_run: bool) -> 
         exit_code=exit_code,
         generated_files=generated,
         artifact_kind=spec.artifact_kind,
+        stdout_log=_relative_log_path(stdout_path, run_root) if stdout_path is not None else "",
+        stderr_log=_relative_log_path(stderr_path, run_root) if stderr_path is not None else "",
+        stderr_tail=_tail_text_lines(stderr_path) if stderr_path is not None and int(exit_code) != 0 else (),
     )
 
 
@@ -373,6 +445,17 @@ def _render_report(
         lines.append(record.display_command)
         lines.append("```")
         lines.append("")
+        if record.stdout_log:
+            lines.append(f"- stdout_log: `{record.stdout_log}`")
+        if record.stderr_log:
+            lines.append(f"- stderr_log: `{record.stderr_log}`")
+        if record.stderr_tail:
+            lines.append("- stderr_tail:")
+            lines.append("")
+            lines.append("```text")
+            lines.extend(record.stderr_tail)
+            lines.append("```")
+            lines.append("")
         if record.generated_files:
             lines.append("- generated files:")
             for rel_path in record.generated_files:

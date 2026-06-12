@@ -38,6 +38,7 @@ NUMERIC_METRICS = (
     "sae_minus_raw",
     "pca_effect",
 )
+OPTIONAL_NUMERIC_METRICS = ("fidelity_fvu",)
 
 
 def _nested_get(obj: Any, dotted: str) -> Any:
@@ -157,7 +158,12 @@ def verify_run(run_root: Path) -> tuple[list[MissingArtifact], list[CheckResult]
             )
         checks.append(check)
 
-    for metric_name in NUMERIC_METRICS:
+    metric_names = list(NUMERIC_METRICS)
+    for metric_name in OPTIONAL_NUMERIC_METRICS:
+        if metric_name in dict(ref_summary.get("metrics", {})):
+            metric_names.append(metric_name)
+
+    for metric_name in metric_names:
         for part in ("mean", "ci_low", "ci_high"):
             check = (
                 _compare_close(

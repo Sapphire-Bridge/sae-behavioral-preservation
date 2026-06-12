@@ -1,26 +1,26 @@
 {
   "compact_topk_effects": {
     "100": {
-      "ci_high": 0.5354269594864148,
-      "ci_low": 0.039836363495311194,
-      "mean": 0.2845384686327809
+      "ci_high": 0.5354009355111573,
+      "ci_low": 0.03980549598430148,
+      "mean": 0.2845032588613931
     },
     "20": {
-      "ci_high": 0.35517480794187384,
-      "ci_low": -0.021846007258452947,
-      "mean": 0.15602175806828134
+      "ci_high": 0.3551791216373973,
+      "ci_low": -0.021836940483992928,
+      "mean": 0.1560289304385325
     },
     "50": {
-      "ci_high": 0.40255930918170196,
-      "ci_low": -0.07611803146029503,
-      "mean": 0.1376165991323325
+      "ci_high": 0.40256586791754406,
+      "ci_low": -0.07613068977210258,
+      "mean": 0.13760874080222787
     }
   },
   "concentration": {
-    "gini": 0.9692409412233218,
-    "mass_at_100": 0.42639872501246584,
-    "mass_at_20": 0.1822104799854982,
-    "mass_at_50": 0.3084705138625243
+    "gini": 0.9692409477892305,
+    "mass_at_100": 0.42639892279922126,
+    "mass_at_20": 0.1822105913805918,
+    "mass_at_50": 0.3084706919869274
   },
   "counts": {
     "n_eval_cases": 52,
@@ -33,9 +33,9 @@
   },
   "execution_profile_id": "sae_writeback_limitation_v1",
   "full_effect": {
-    "ci_high": 0.9837844528082008,
-    "ci_low": -0.01365773558165326,
-    "mean": 0.4957860315575974
+    "ci_high": 0.9837216613949551,
+    "ci_low": -0.013689007869066879,
+    "mean": 0.4957639835655223
   },
   "layer": 4,
   "model": {
@@ -48,7 +48,7 @@
     "bootstrap_n": 1000,
     "ci": 0.95,
     "frac_selection": 0.5,
-    "git_commit": "e633243a9abb72fad5c66a1cb7ee6d5493b3b7d2",
+    "git_commit": "708509d8a4d55cdaf61de848340fd1cba4312f92",
     "seed": 0,
     "source_schema_version": "topk_recovery_v1",
     "split_seed": 0
@@ -59,7 +59,7 @@
   },
   "source_artifacts": {
     "topk_summary": "results/sae_writeback_limitation_release/source/topk/gemma3_4b_topk.summary.json",
-    "topk_summary_sha256": "29e8bf9703fa357716b8e00f69260c0468249df065088d485cf155c0d3d6ed87"
+    "topk_summary_sha256": "059c687f1949224a4c7ad6b0639ef1a636c19437787c1983ee734428a83edeac"
   },
   "summary_schema_version": "sae_writeback_limitation_topk_v1"
 }

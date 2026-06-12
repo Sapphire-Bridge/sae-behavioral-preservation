@@ -72,6 +72,10 @@ def _mean(summary: Mapping[str, Any], name: str) -> float:
     return float(_metric(summary, name)["mean"])
 
 
+def _has_metric(summary: Mapping[str, Any], name: str) -> bool:
+    return isinstance(summary.get("metrics", {}).get(name), Mapping)
+
+
 def _ci_literal(summary: Mapping[str, Any], name: str) -> str:
     metric = _metric(summary, name)
     return f"[{_fmt3(metric['ci_low'])}, {_fmt3(metric['ci_high'])}]"
@@ -144,6 +148,10 @@ def _context_number_allowlist() -> set[str]:
         "0",
         "2024",
         "2025",
+        "0009",
+        "0001",
+        "9137",
+        "0730",
         str(profile.sae_width),
         *(str(layer) for layer in profile.paper_layers),
         *(str(layer) for layer in profile.public_layers),
@@ -173,6 +181,8 @@ def _layer_comparability_check(layer: int, summary: Mapping[str, Any], source: P
         _fmt3(crr),
         _fmt3(_mean(summary, "pca_effect")),
     )
+    if _has_metric(summary, "fidelity_fvu"):
+        literals = literals + (_fmt3(_mean(summary, "fidelity_fvu")),)
     if layer in {4, 8}:
         literals = literals + (_fmt_percent1(crr),)
     return LiteralCheck(
@@ -315,7 +325,10 @@ def _method_surface_check() -> LiteralCheck:
             "CRR(T | R)",
             "ratio of mean effects",
             "donor-directed effect",
-            "matched writeback",
+            "matched activation patching",
+            "layer-token intervention site",
+            "behavioral preservation assay",
+            "Does Not Certify Behavioral Preservation",
         ),
         sources=(
             Path("paper/sae_writeback_limitation_short_paper.md"),
@@ -341,6 +354,8 @@ def _five_layer_profile_check(source: Path) -> LiteralCheck:
     rows = _read_csv(source)
     literals: list[str] = []
     for row in rows:
+        if "fidelity_fvu_mean" in row:
+            literals.append(_fmt3(row["fidelity_fvu_mean"]))
         literals.append(
             f"{_fmt3(row['crr_mean'])} [{_fmt3(row['crr_ci_low'])}, {_fmt3(row['crr_ci_high'])}]"
         )
@@ -352,7 +367,7 @@ def _five_layer_profile_check(source: Path) -> LiteralCheck:
         label="five-layer auxiliary profile literals",
         literals=tuple(literals),
         sources=(source,),
-        note="Auxiliary five-layer CRR and SAE-minus-raw values from the source profile table.",
+        note="Auxiliary five-layer FVU, CRR, and SAE-minus-raw values from the source profile table.",
     )
 
 
@@ -514,7 +529,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Check literal prose numbers in paper/sae_writeback_limitation_short_paper.md "
-            "against the public SAE writeback limitation release artifacts."
+            "against the public SAE behavioral preservation release artifacts."
         )
     )
     parser.add_argument("--paper", type=Path, default=DEFAULT_PAPER, help="Short paper markdown file to check.")

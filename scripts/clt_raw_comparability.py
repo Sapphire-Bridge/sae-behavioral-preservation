@@ -611,6 +611,8 @@ def _aggregate_layer(
         "stress_delta_resid_norm_ratio",
         "stress_delta_resid_cosine_raw",
         "stress_delta_additivity_rel_err",
+        "fidelity_error_sse",
+        "fidelity_centered_sse",
         "fidelity_rel_mse",
         "fidelity_rel_l2",
         "fidelity_cosine",
@@ -696,6 +698,21 @@ def _aggregate_layer(
         out[f"{name}_ci_low"] = lo
         out[f"{name}_ci_high"] = hi
         out[f"{name}_n_pairs"] = int(n_pairs)
+
+    ratio, lo, hi, n_pairs = _cluster_bootstrap_ratio(
+        rows=layer_rows,
+        num_key="fidelity_error_sse",
+        den_key="fidelity_centered_sse",
+        pair_key="pair_id",
+        n_bootstrap=n_bootstrap,
+        ci=ci,
+        seed=seed,
+        den_eps=1e-12,
+    )
+    out["fidelity_fvu_mean"] = ratio
+    out["fidelity_fvu_ci_low"] = lo
+    out["fidelity_fvu_ci_high"] = hi
+    out["fidelity_fvu_n_pairs"] = int(n_pairs)
     return out
 
 
@@ -1237,6 +1254,7 @@ def main() -> None:
     rows: List[Dict[str, Any]] = []
     fail_counts: Dict[str, int] = defaultdict(int)
     fail_reasons: Dict[str, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    fvu_records: List[Dict[str, Any]] = []
     partial_csv_path = Path(args.out_csv).with_suffix(".partial.csv")
 
     def _record_arm_failure(arm: str, reason: str) -> None:
@@ -1423,6 +1441,10 @@ def main() -> None:
                 fidelity_rel_l2 = float(torch.norm(recon_err).item() / (torch.norm(recv_slice).item() + 1e-12))
                 fidelity_cosine = _cosine(recon, recv_slice)
                 recon_norm_ratio = _norm_ratio(recon, recv_slice)
+                recv_for_fvu = recv_slice.detach().to(device="cpu").to(dtype=torch.float64)[0]
+                fvu_activation_sum = recv_for_fvu.sum(dim=0)
+                fvu_activation_sq_sum = float((recv_for_fvu**2).sum().item())
+                fvu_n_tokens = int(recv_for_fvu.size(0))
 
                 # --- 3/8  CLT writeback deltas (arms C and D) -----------------
                 clt_delta_c = _compute_clt_writeback_delta(
@@ -1925,6 +1947,7 @@ def main() -> None:
                         "recon_norm_ratio": float(recon_norm_ratio),
                         "active_latent_count": int(active_latent_count),
                         "active_latent_frac": float(active_latent_frac),
+                        "fidelity_error_sse": float(err_sse),
                         "fidelity_rel_mse": float(fidelity_rel_mse),
                         "fidelity_rel_l2": float(fidelity_rel_l2),
                         "fidelity_cosine": float(fidelity_cosine),
@@ -2098,8 +2121,60 @@ def main() -> None:
                     row["d_STRESS_SUM_A"] = float("nan")
                     row["d_STRESS_RESID_RECON"] = float("nan")
 
+                fvu_records.append(
+                    {
+                        "row": row,
+                        "layer": int(layer),
+                        "activation_sum": fvu_activation_sum,
+                        "activation_sq_sum": float(fvu_activation_sq_sum),
+                        "n_tokens": int(fvu_n_tokens),
+                        "error_sse": float(err_sse),
+                    }
+                )
                 rows.append(row)
                 _checkpoint_partial_rows()
+
+    fvu_layer_sums: Dict[int, torch.Tensor] = {}
+    fvu_layer_counts: Dict[int, int] = defaultdict(int)
+    for record in fvu_records:
+        if not bool(record["row"].get("analysis_included", False)):
+            continue
+        layer = int(record["layer"])
+        activation_sum = record["activation_sum"]
+        if layer not in fvu_layer_sums:
+            fvu_layer_sums[layer] = torch.zeros_like(activation_sum, dtype=torch.float64)
+        fvu_layer_sums[layer] = fvu_layer_sums[layer] + activation_sum
+        fvu_layer_counts[layer] += int(record["n_tokens"])
+
+    fvu_layer_means: Dict[int, torch.Tensor] = {}
+    for layer, activation_sum in fvu_layer_sums.items():
+        n_tokens = int(fvu_layer_counts[layer])
+        if n_tokens > 0:
+            fvu_layer_means[int(layer)] = activation_sum / float(n_tokens)
+
+    for record in fvu_records:
+        layer = int(record["layer"])
+        row = record["row"]
+        layer_mean = fvu_layer_means.get(layer)
+        if layer_mean is None:
+            centered_sse = float("nan")
+            fidelity_fvu = float("nan")
+        else:
+            mean_norm_sq = float((layer_mean**2).sum().item())
+            centered_sse = float(
+                record["activation_sq_sum"]
+                - 2.0 * float(torch.dot(layer_mean, record["activation_sum"]).item())
+                + float(record["n_tokens"]) * mean_norm_sq
+            )
+            if centered_sse < 0.0 and centered_sse > -1e-8:
+                centered_sse = 0.0
+            fidelity_fvu = (
+                float(record["error_sse"] / centered_sse)
+                if math.isfinite(centered_sse) and centered_sse > 1e-12
+                else float("nan")
+            )
+        row["fidelity_centered_sse"] = float(centered_sse)
+        row["fidelity_fvu"] = float(fidelity_fvu)
 
     _write_csv(rows, Path(args.out_csv))
 

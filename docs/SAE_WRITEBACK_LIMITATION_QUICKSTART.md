@@ -1,6 +1,6 @@
-# SAE Writeback Limitation Quickstart
+# SAE Behavioral Preservation Quickstart
 
-This surface is intentionally small. It covers the public result package for the SAE writeback limitation claim family, not the full reproduction bundle.
+This surface is intentionally small. It covers the public result package for the SAE behavioral preservation claim family, not the full reproduction bundle.
 
 For the full paper rerun, use:
 
@@ -68,6 +68,6 @@ make limitation-reviewer-check-gpu
 
 ## PASS / FAIL
 
-- `PASS` means the fresh CPU L4 public summary matches the checked-in L4 reference on the public headline metrics and identity fields.
+- `PASS` means the fresh L4 public summary matches the checked-in L4 reference on the public headline metrics and identity fields.
 - `FAIL` means the fresh L4 run drifted on either the frozen identity fields, counts, or one of the public numeric metrics.
 - This quickstart does not rerun L8 or top-k and does not validate any bundle, contract, CI, or archive surface.

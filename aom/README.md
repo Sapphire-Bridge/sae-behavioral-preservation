@@ -1,6 +1,6 @@
 # aom
 
-Internal package for the SAE writeback limitation analysis.
+Internal package for the SAE behavioral preservation analysis.
 
 Provides the core primitives used by `scripts/clt_raw_comparability.py` and related scripts:
 

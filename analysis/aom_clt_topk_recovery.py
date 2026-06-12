@@ -12,6 +12,10 @@ from typing import Any, Dict, List
 
 import torch
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from aom.data.loaders import load_disamb_pairs
 from aom.interventions.clt_adapter import CLTInputTransform, CLTPatchConfig
 from aom.interventions.clt_loader import load_clt

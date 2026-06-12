@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Public release surface builder for the SAE writeback limitation result.
+Public release surface builder for the SAE behavioral preservation result.
 
 This module is governance/derivation code: it does not run new model
 experiments. It reads source artifacts and exposes builders used by the release
@@ -160,6 +160,10 @@ def _metric_triplet(entry: dict[str, Any], prefix: str) -> dict[str, float]:
         "ci_low": float(entry[f"{prefix}_ci_low"]),
         "ci_high": float(entry[f"{prefix}_ci_high"]),
     }
+
+
+def _has_metric_triplet(entry: dict[str, Any], prefix: str) -> bool:
+    return all(f"{prefix}_{suffix}" in entry for suffix in ("mean", "ci_low", "ci_high"))
 
 
 def _required_dict(obj: Any, name: str) -> dict[str, Any]:
@@ -450,6 +454,11 @@ def build_public_comparability_summary(
         "metrics": {
             "fidelity_cosine": _metric_triplet(entry, "fidelity_cosine"),
             "fidelity_rel_mse": _metric_triplet(entry, "fidelity_rel_mse"),
+            **(
+                {"fidelity_fvu": _metric_triplet(entry, "fidelity_fvu")}
+                if _has_metric_triplet(entry, "fidelity_fvu")
+                else {}
+            ),
             "raw_effect": _metric_triplet(entry, "effect_A"),
             "sae_effect": _metric_triplet(entry, "effect_C"),
             "sae_minus_raw": _metric_triplet(entry, "d_CA"),
@@ -637,6 +646,22 @@ def build_limitation_release_manifest(
             }
             for layer in tuple(int(layer) for layer in profile.public_layers)
         ],
+        "source_five_layer_fvu": [
+            {
+                "layer": int(entry["layer"]),
+                "fidelity_fvu_mean": float(entry["fidelity_fvu_mean"]),
+                "fidelity_fvu_ci_low": float(entry["fidelity_fvu_ci_low"]),
+                "fidelity_fvu_ci_high": float(entry["fidelity_fvu_ci_high"]),
+            }
+            for entry in sorted(
+                (
+                    item
+                    for item in comparability_summary.get("per_layer", [])
+                    if int(item.get("layer", -1)) in set(int(layer) for layer in profile.paper_layers)
+                ),
+                key=lambda item: int(item["layer"]),
+            )
+        ],
         "identity": {
             "model_id": identity.model_id,
             "model_revision": identity.model_revision,
@@ -672,8 +697,23 @@ def build_limitation_release_manifest(
 
 
 def write_centerpiece_table(summaries: Iterable[dict[str, Any]], out_path: Path) -> None:
+    materialized = sorted(list(summaries), key=lambda item: int(item["layer"]))
+    all_have_fvu = materialized and all(
+        "fidelity_fvu" in _required_dict(summary.get("metrics"), "comparability.metrics")
+        for summary in materialized
+    )
+    metric_names = [
+        "fidelity_cosine",
+        "fidelity_rel_mse",
+        *(["fidelity_fvu"] if all_have_fvu else []),
+        "raw_effect",
+        "sae_effect",
+        "sae_minus_raw",
+        "crr",
+        "pca_effect",
+    ]
     rows = []
-    for summary in sorted(summaries, key=lambda item: int(item["layer"])):
+    for summary in materialized:
         metrics = _required_dict(summary.get("metrics"), "comparability.metrics")
         counts = _required_dict(summary.get("counts"), "comparability.counts")
         row = {
@@ -681,15 +721,7 @@ def write_centerpiece_table(summaries: Iterable[dict[str, Any]], out_path: Path)
             "n_pairs_analysis_included": int(counts["n_pairs_analysis_included"]),
             "n_invariant_fail_rows": int(counts["n_invariant_fail_rows"]),
         }
-        for metric_name in (
-            "fidelity_cosine",
-            "fidelity_rel_mse",
-            "raw_effect",
-            "sae_effect",
-            "sae_minus_raw",
-            "crr",
-            "pca_effect",
-        ):
+        for metric_name in metric_names:
             metric = _required_dict(metrics.get(metric_name), f"comparability.metrics.{metric_name}")
             row[f"{metric_name}_mean"] = metric["mean"]
             row[f"{metric_name}_ci_low"] = metric["ci_low"]
@@ -767,7 +799,7 @@ def render_centerpiece_figure(summaries: Iterable[dict[str, Any]], out_path: Pat
         f'<line x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_height}" stroke="#222222" stroke-width="1"/>',
         f'<line x1="{left}" y1="{top + plot_height}" x2="{left + plot_width}" y2="{top + plot_height}" stroke="#222222" stroke-width="1"/>',
         f'<line x1="{left}" y1="{zero_y:.1f}" x2="{left + plot_width}" y2="{zero_y:.1f}" stroke="#aaaaaa" stroke-width="1" stroke-dasharray="4 4"/>',
-        _svg_text(left, 24, "SAE writeback limitation: L4/L8 centerpiece", size=16, weight="bold"),
+        _svg_text(left, 24, "SAE behavioral preservation: L4/L8 centerpiece", size=16, weight="bold"),
     ]
     for idx, summary in enumerate(entries):
         group_left = left + idx * group_width + bar_width * 0.5
@@ -1742,6 +1774,8 @@ def build_limitation_derived_outputs(
             "sae_minus_raw": _metric_triplet(entry, "d_CA"),
             "crr": _metric_triplet(entry, "crr_C_over_A"),
         }
+        if _has_metric_triplet(entry, "fidelity_fvu"):
+            payload["fidelity_fvu"] = _metric_triplet(entry, "fidelity_fvu")
         gemma3_centerpiece[str(layer)] = payload
 
     layer4_entry = _per_layer_entry(comparability_summary, 4)

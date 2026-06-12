@@ -189,7 +189,7 @@ def _release_artifact_root(*paths: Path) -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build the public SAE writeback limitation release surface.")
+    parser = argparse.ArgumentParser(description="Build the public SAE behavioral preservation release surface.")
     parser.add_argument(
         "--source_run_root",
         default="",

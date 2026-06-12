@@ -19,18 +19,18 @@
     ],
     "version": "all_arms_success_with_diagnostic_invariant_gates_v1"
   },
-  "build_profile": "cpu_float32_reference_v1",
+  "build_profile": "mps_float32_noncanonical_v1",
   "environment": {
-    "device": "cpu",
+    "device": "mps",
     "platform": "macOS-15.7.3-arm64-arm-64bit",
     "python_version": "3.11.15",
-    "topk_device": "cpu",
+    "topk_device": "mps",
     "topk_torch_dtype": "float32",
     "torch_dtype": "float32",
     "torch_version": "2.5.1"
   },
   "execution_profile_id": "sae_writeback_limitation_v1",
-  "git_commit": "dcd062f2a804a235cce43d93c8e8458f64c9fd03",
+  "git_commit": "708509d8a4d55cdaf61de848340fd1cba4312f92",
   "identity": {
     "dataset_bundle_id": "db5cb11757fce2cc6f803baedb11173c0ccee311c839fe8103cb4f974bcba0c6",
     "dataset_manifest_sha256": "81bc6129775ff29a650a1eebfbfe9dded6a3923e877b740fa744989440d564d0",
@@ -46,18 +46,18 @@
       "layer": 4,
       "source_artifacts": {
         "comparability_summary": "results/sae_writeback_limitation_release/comparability/l4/comparability.summary.json",
-        "comparability_summary_sha256": "e7a7f71a940f49acaaca9c6ff63fc32030e23119a9bcd59be094724a60c56bab",
+        "comparability_summary_sha256": "e8f40cd802f9c72ce6aad9ec462ecf8aae2a8b6ebd85046c7f1d54de34b642e1",
         "topk_summary": "results/sae_writeback_limitation_release/topk/l4/topk.summary.json",
-        "topk_summary_sha256": "2e8e652337aed2a934ac69a40f2553769a8ef10079bbe1fdc9bfe73f0890914d"
+        "topk_summary_sha256": "d29d5e93b48267a5ccdea3dfd9bd5bd07cbba0c2f6f74be956ace9af32e08a42"
       }
     },
     {
       "layer": 8,
       "source_artifacts": {
         "comparability_summary": "results/sae_writeback_limitation_release/comparability/l8/comparability.summary.json",
-        "comparability_summary_sha256": "30d377811dffbff6dc8249cef0907a681a0631c5a17c9f9073c0f8c149f530c3",
+        "comparability_summary_sha256": "44275eab3727da7d308da816939e5c561e222a5623d08f0d0bedf40b64131c71",
         "topk_summary": "results/sae_writeback_limitation_release/topk/l8/topk.summary.json",
-        "topk_summary_sha256": "73013c6d41df6d6970e7f6b15bbd6127f7155461dba21bf513bbcd94a410beca"
+        "topk_summary_sha256": "2846e0cd6c12d0ebbe273142a97258b0c6be4038ad92277a2b8fa9fe53a85534"
       }
     }
   ],
@@ -73,10 +73,42 @@
   },
   "source_artifacts": {
     "comparability_csv": "results/sae_writeback_limitation_release/source/comparability/gemma3_4b_comparability.csv",
-    "comparability_csv_sha256": "25b98bba3e947575c6521e1e04021eeb88d64e756e4772c6f35aeae86c1708ec",
+    "comparability_csv_sha256": "86c4d4955967799c5c6be3d1d4e76099dc6b193b61f595805b58f8dc3ce1509a",
     "comparability_summary": "results/sae_writeback_limitation_release/source/comparability/gemma3_4b_comparability.summary.json",
-    "comparability_summary_sha256": "4c289e9a8c42617580f1cdb1e7e9ca724a703f49670b262076d919a8cdf4fc99",
+    "comparability_summary_sha256": "eb6aedc503cfbbd824ab77317e98c37b971bd9a197a02426f4d1cf724108e0af",
     "topk_summary": "results/sae_writeback_limitation_release/source/topk/gemma3_4b_topk.summary.json",
-    "topk_summary_sha256": "29e8bf9703fa357716b8e00f69260c0468249df065088d485cf155c0d3d6ed87"
-  }
+    "topk_summary_sha256": "059c687f1949224a4c7ad6b0639ef1a636c19437787c1983ee734428a83edeac"
+  },
+  "source_five_layer_fvu": [
+    {
+      "layer": 4,
+      "fidelity_fvu_mean": 0.13743531227123298,
+      "fidelity_fvu_ci_low": 0.1260134421605599,
+      "fidelity_fvu_ci_high": 0.1504138820780153
+    },
+    {
+      "layer": 5,
+      "fidelity_fvu_mean": 0.1804687722041402,
+      "fidelity_fvu_ci_low": 0.1666967168228329,
+      "fidelity_fvu_ci_high": 0.1962622106201656
+    },
+    {
+      "layer": 8,
+      "fidelity_fvu_mean": 0.06043178329166126,
+      "fidelity_fvu_ci_low": 0.027153677173653263,
+      "fidelity_fvu_ci_high": 0.21629725739385355
+    },
+    {
+      "layer": 11,
+      "fidelity_fvu_mean": 0.3364485185439825,
+      "fidelity_fvu_ci_low": 0.27015145978034083,
+      "fidelity_fvu_ci_high": 0.4288090639739756
+    },
+    {
+      "layer": 16,
+      "fidelity_fvu_mean": 0.5383827126770173,
+      "fidelity_fvu_ci_low": 0.43627925510662935,
+      "fidelity_fvu_ci_high": 0.6657219831939083
+    }
+  ]
 }

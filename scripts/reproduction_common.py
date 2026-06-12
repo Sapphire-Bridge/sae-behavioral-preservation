@@ -30,6 +30,9 @@ class CommandRecord:
     exit_code: int
     generated_files: tuple[str, ...]
     artifact_kind: str = "core"
+    stdout_log: str = ""
+    stderr_log: str = ""
+    stderr_tail: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

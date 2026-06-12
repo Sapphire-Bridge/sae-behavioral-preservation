@@ -106,6 +106,7 @@ def _layer_row(
     *,
     fidelity_cosine: float,
     fidelity_rel_mse: float,
+    fidelity_fvu: float,
     raw: float,
     sae: float,
     delta: float,
@@ -113,7 +114,7 @@ def _layer_row(
     crr: float,
     n_pairs: int = 52,
 ) -> dict:
-    return {
+    row = {
         "layer": int(layer),
         "n_pairs": int(n_pairs),
         "fidelity_cosine_mean": fidelity_cosine,
@@ -156,15 +157,73 @@ def _layer_row(
         "crr_C_over_A_ci_low": crr - 0.10,
         "crr_C_over_A_ci_high": crr + 0.10,
     }
+    row.update(
+        {
+            "fidelity_fvu_mean": float(fidelity_fvu),
+            "fidelity_fvu_ci_low": float(fidelity_fvu) - 0.001,
+            "fidelity_fvu_ci_high": float(fidelity_fvu) + 0.001,
+        }
+    )
+    return row
 
 
 def _comparability_source_summary(profile: limitation_requirements.LimitationProfile, *, layers: tuple[int, ...]) -> dict:
     layer_rows = {
-        4: _layer_row(4, fidelity_cosine=0.997, fidelity_rel_mse=0.007, raw=0.821, sae=0.498, delta=-0.323, pca=0.818, crr=0.607),
-        5: _layer_row(5, fidelity_cosine=0.998, fidelity_rel_mse=0.007, raw=0.610, sae=0.562, delta=-0.048, pca=0.601, crr=0.921),
-        8: _layer_row(8, fidelity_cosine=0.998, fidelity_rel_mse=0.007, raw=0.620, sae=0.604, delta=-0.016, pca=0.615, crr=0.974),
-        11: _layer_row(11, fidelity_cosine=0.999, fidelity_rel_mse=0.005, raw=0.700, sae=0.403, delta=-0.297, pca=0.692, crr=0.576),
-        16: _layer_row(16, fidelity_cosine=0.998, fidelity_rel_mse=0.004, raw=0.760, sae=0.480, delta=-0.280, pca=0.748, crr=0.632),
+        4: _layer_row(
+            4,
+            fidelity_cosine=0.997,
+            fidelity_rel_mse=0.007,
+            fidelity_fvu=0.015,
+            raw=0.821,
+            sae=0.498,
+            delta=-0.323,
+            pca=0.818,
+            crr=0.607,
+        ),
+        5: _layer_row(
+            5,
+            fidelity_cosine=0.998,
+            fidelity_rel_mse=0.007,
+            fidelity_fvu=0.014,
+            raw=0.610,
+            sae=0.562,
+            delta=-0.048,
+            pca=0.601,
+            crr=0.921,
+        ),
+        8: _layer_row(
+            8,
+            fidelity_cosine=0.998,
+            fidelity_rel_mse=0.007,
+            fidelity_fvu=0.015,
+            raw=0.620,
+            sae=0.604,
+            delta=-0.016,
+            pca=0.615,
+            crr=0.974,
+        ),
+        11: _layer_row(
+            11,
+            fidelity_cosine=0.999,
+            fidelity_rel_mse=0.005,
+            fidelity_fvu=0.011,
+            raw=0.700,
+            sae=0.403,
+            delta=-0.297,
+            pca=0.692,
+            crr=0.576,
+        ),
+        16: _layer_row(
+            16,
+            fidelity_cosine=0.998,
+            fidelity_rel_mse=0.004,
+            fidelity_fvu=0.010,
+            raw=0.760,
+            sae=0.480,
+            delta=-0.280,
+            pca=0.748,
+            crr=0.632,
+        ),
     }
     return {
         "schema_version": "comparability_source_v1",
@@ -759,13 +818,16 @@ def test_build_limitation_release_surface_writes_expected_outputs_from_source_ru
     topk_l8 = json.loads((results_root / "topk" / "l8" / "topk.summary.json").read_text(encoding="utf-8"))
     assert comp_l4["model"]["id"] == profile.model_id
     assert comp_l4["dataset"]["disamb_path"] == profile.dataset_disamb_path
+    assert comp_l4["metrics"]["fidelity_fvu"]["mean"] == pytest.approx(0.015)
     assert comp_l4["metrics"]["sae_minus_raw"]["mean"] == pytest.approx(-0.323)
     assert comp_l4["metrics"]["crr"]["mean"] == pytest.approx(0.607)
+    assert comp_l8["metrics"]["fidelity_fvu"]["mean"] == pytest.approx(0.015)
     assert comp_l8["metrics"]["sae_minus_raw"]["mean"] == pytest.approx(-0.016)
     assert topk_l4["compact_topk_effects"]["100"]["mean"] == pytest.approx(0.496 * 0.60)
     assert topk_l8["compact_topk_effects"]["100"]["mean"] == pytest.approx(0.604 * 0.60)
     assert (tables_root / "centerpiece_summary.csv").exists()
     centerpiece_rows = list(csv.DictReader((tables_root / "centerpiece_summary.csv").open(encoding="utf-8")))
+    assert float(centerpiece_rows[0]["fidelity_fvu_mean"]) == pytest.approx(0.015)
     assert float(centerpiece_rows[0]["crr_mean"]) == pytest.approx(0.607)
     assert (tables_root / "topk_summary.csv").exists()
     assert (tables_root / "robustness_input_case_target.csv").exists()
@@ -1214,6 +1276,7 @@ def test_run_limitation_paper_derive_mode_writes_expected_outputs(tmp_path: Path
 
     assert code == 0
     numbers = json.loads(limitation_requirements.limitation_derived_numbers_path(run_root).read_text(encoding="utf-8"))
+    assert numbers["gemma3_centerpiece"]["4"]["fidelity_fvu"]["mean"] == pytest.approx(0.015)
     assert numbers["gemma3_centerpiece"]["4"]["crr"]["mean"] == pytest.approx(0.607)
     assert numbers["gemma3_centerpiece"]["5"]["crr"]["mean"] == pytest.approx(0.921)
     assert numbers["gemma3_pca_l4"]["random_mean_effect"]["mean"] > 0.0

@@ -1,6 +1,6 @@
 # Evaluation data
 
-The canonical evaluation dataset for the SAE writeback limitation result is
+The canonical evaluation dataset for the SAE behavioral preservation result is
 `data_paper_hardened_v2/disamb_pairs.jsonl` (52 paired homonym disambiguation
 cases). The schema below documents the `.jsonl` format.
 
