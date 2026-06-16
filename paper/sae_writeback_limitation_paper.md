@@ -22,7 +22,7 @@ Public note accompanying the SAE behavioral preservation result.
 
 ## Reader-Facing Result
 
-The centerpiece result is the L4/L8 comparability surface. For each layer the public summary exposes only the headline fidelity and causal-effect fields: fidelity cosine, fidelity relative MSE, raw effect, SAE effect, SAE-minus-raw, and PCA effect. The intended reading order is:
+The centerpiece result is the L4/L8 comparability surface. For each layer the public summary exposes only the headline fidelity and causal-effect fields: fidelity cosine, fidelity relative MSE, FVU, raw effect, SAE effect, SAE-minus-raw, CRR, and PCA effect. The intended reading order is:
 
 1. Check the fidelity fields to see that reconstruction quality is not trivially poor.
 2. Compare raw effect and SAE effect to evaluate behavioral preservation at the active intervention site.
@@ -45,7 +45,6 @@ For a fresh full-paper rerun from local assets, use:
 python scripts/prepare_limitation_bundle.py --local_files_only
 python scripts/run_limitation_paper.py \
   --run_root /tmp/sae_limitation_full \
-  --device auto \
-  --require_accelerator \
+  --device cpu \
   --local_files_only
 ```

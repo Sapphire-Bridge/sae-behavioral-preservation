@@ -9,8 +9,7 @@ export HF_TOKEN="hf_..."
 make limitation-assets
 python scripts/run_limitation_paper.py \
   --run_root /tmp/sae_limitation_full \
-  --device auto \
-  --require_accelerator
+  --device cpu
 ```
 
 If the required model and Gemma Scope snapshots are already cached locally and
@@ -20,8 +19,7 @@ you want to force offline-only execution, use:
 make limitation-assets LIMITATION_ASSETS_ARGS="--local_files_only"
 python scripts/run_limitation_paper.py \
   --run_root /tmp/sae_limitation_full \
-  --device auto \
-  --require_accelerator \
+  --device cpu \
   --local_files_only
 ```
 

@@ -136,7 +136,7 @@ For the full limitation rerun and release-surface rebuild:
 
 ```bash
 make limitation-assets
-make limitation-reproduce LIMITATION_REPRODUCE_ARGS="--run_root /tmp/sae_limitation_full --device auto --require_accelerator"
+make limitation-reproduce LIMITATION_REPRODUCE_ARGS="--run_root /tmp/sae_limitation_full --device cpu"
 make limitation-reproduce-verify LIMITATION_REPRODUCE_VERIFY_ARGS="--run_root /tmp/sae_limitation_full"
 ```
 
@@ -146,6 +146,11 @@ This rebuilds the limitation analysis from local assets and writes:
 - fresh source summaries and derived summaries
 - release `results/`, `tables/`, and `figures/`
 - a verification pass against the committed governance surface
+
+The committed release surface is the CPU float32 reference profile recorded in
+`tables/sae_writeback_limitation_release/release_manifest.json`. Accelerator
+runs are useful for quickchecks, but the full canonical comparison should be
+made against the CPU profile.
 
 Wall time depends on hardware and cache state; expect substantially longer than
 the quickcheck.
@@ -163,6 +168,7 @@ the quickcheck.
 | Main table | `tables/sae_writeback_limitation_release/centerpiece_summary.csv` |
 | Top-k table | `tables/sae_writeback_limitation_release/topk_summary.csv` |
 | Quickstart | `docs/SAE_WRITEBACK_LIMITATION_QUICKSTART.md` |
+| CPU full-run record | `docs/runs/sae_limitation_cpu_fvu_v2.md` |
 
 ## Code Orientation
 

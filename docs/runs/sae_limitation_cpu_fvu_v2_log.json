@@ -1,0 +1,238 @@
+{
+  "effective_device": "cpu",
+  "local_files_only": true,
+  "missing": [],
+  "mode": "full",
+  "profile": {
+    "compact_ks": [
+      20,
+      50,
+      100
+    ],
+    "comparability_hard_fail_invariant": false,
+    "comparability_hard_fail_primary_logodds": false,
+    "comparability_primary_logodds_residual_tol": 5e-06,
+    "model_id": "google/gemma-3-4b-pt",
+    "model_revision": "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+    "paper_layers": [
+      4,
+      5,
+      8,
+      11,
+      16
+    ],
+    "public_layers": [
+      4,
+      8
+    ],
+    "sae_repo_id": "google/gemma-scope-2-4b-pt",
+    "sae_repo_revision": "a0ffd6132a985bc84077a66d1a1033e10b604fa8",
+    "sae_source_entries": {
+      "11": {
+        "bundle_run_name": "layer_11_width_16k_l0_big",
+        "expected_l0": 118,
+        "source_entry": "resid_post_all/layer_11_width_16k_l0_big"
+      },
+      "16": {
+        "bundle_run_name": "layer_16_width_16k_l0_big",
+        "expected_l0": 120,
+        "source_entry": "resid_post_all/layer_16_width_16k_l0_big"
+      },
+      "4": {
+        "bundle_run_name": "layer_4_width_16k_l0_big",
+        "expected_l0": 81,
+        "source_entry": "resid_post_all/layer_4_width_16k_l0_big"
+      },
+      "5": {
+        "bundle_run_name": "layer_5_width_16k_l0_big",
+        "expected_l0": 86,
+        "source_entry": "resid_post_all/layer_5_width_16k_l0_big"
+      },
+      "8": {
+        "bundle_run_name": "layer_8_width_16k_l0_big",
+        "expected_l0": 102,
+        "source_entry": "resid_post_all/layer_8_width_16k_l0_big"
+      }
+    },
+    "sae_width": "16k",
+    "tokenizer_revision": "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+    "topk_layers": [
+      4,
+      8
+    ]
+  },
+  "records": [
+    {
+      "argv": [
+        "python",
+        "scripts/clt_raw_comparability.py",
+        "--model_name_or_path",
+        "google/gemma-3-4b-pt",
+        "--revision",
+        "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+        "--tokenizer_revision",
+        "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+        "--disamb_path",
+        "data_paper_hardened_v2/disamb_pairs.jsonl",
+        "--clt_repo",
+        "clt_bundles/sae_writeback_limitation_release",
+        "--clt_width",
+        "16k",
+        "--layers",
+        "4,5,8,11,16",
+        "--device",
+        "cpu",
+        "--attn_implementation",
+        "eager",
+        "--seed",
+        "42",
+        "--bootstrap_n",
+        "1000",
+        "--bootstrap_seed",
+        "42",
+        "--ci",
+        "0.95",
+        "--primary_logodds_residual_tol",
+        "5e-06",
+        "--run_pca_baseline",
+        "--run_random_orth_baseline",
+        "--run_faithfulness_decomposition_arms",
+        "--out_csv",
+        "$RUN_ROOT/source/comparability/gemma3_4b_comparability.csv",
+        "--out_json",
+        "$RUN_ROOT/source/comparability/gemma3_4b_comparability.summary.json",
+        "--no-hard_fail_invariant",
+        "--no-hard_fail_primary_logodds",
+        "--torch_dtype",
+        "float32",
+        "--local_files_only"
+      ],
+      "artifact_kind": "core",
+      "display_command": "python scripts/clt_raw_comparability.py --model_name_or_path google/gemma-3-4b-pt --revision cc012e0a6d0787b4adcc0fa2c4da74402494554d --tokenizer_revision cc012e0a6d0787b4adcc0fa2c4da74402494554d --disamb_path data_paper_hardened_v2/disamb_pairs.jsonl --clt_repo clt_bundles/sae_writeback_limitation_release --clt_width 16k --layers 4,5,8,11,16 --device cpu --attn_implementation eager --seed 42 --bootstrap_n 1000 --bootstrap_seed 42 --ci 0.95 --primary_logodds_residual_tol 5e-06 --run_pca_baseline --run_random_orth_baseline --run_faithfulness_decomposition_arms --out_csv '$RUN_ROOT/source/comparability/gemma3_4b_comparability.csv' --out_json '$RUN_ROOT/source/comparability/gemma3_4b_comparability.summary.json' --no-hard_fail_invariant --no-hard_fail_primary_logodds --torch_dtype float32 --local_files_only",
+      "ended_at_utc": "2026-06-16T00:01:58+00:00",
+      "exit_code": 0,
+      "generated_files": [
+        "logs/gemma_3_comparability_source_run.stderr.log",
+        "logs/gemma_3_comparability_source_run.stdout.log",
+        "source/comparability/gemma3_4b_comparability.csv",
+        "source/comparability/gemma3_4b_comparability.partial.csv",
+        "source/comparability/gemma3_4b_comparability.summary.json"
+      ],
+      "name": "Gemma-3 comparability source run",
+      "started_at_utc": "2026-06-15T12:07:12+00:00",
+      "stderr_log": "$RUN_ROOT/logs/gemma_3_comparability_source_run.stderr.log",
+      "stderr_tail": [],
+      "stdout_log": "$RUN_ROOT/logs/gemma_3_comparability_source_run.stdout.log"
+    },
+    {
+      "argv": [
+        "python",
+        "analysis/aom_clt_topk_recovery.py",
+        "--model_name_or_path",
+        "google/gemma-3-4b-pt",
+        "--revision",
+        "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+        "--tokenizer_revision",
+        "cc012e0a6d0787b4adcc0fa2c4da74402494554d",
+        "--clt_repo",
+        "clt_bundles/sae_writeback_limitation_release",
+        "--clt_width",
+        "16k",
+        "--layers",
+        "4,8",
+        "--ks",
+        "20,50,100",
+        "--logz_ks",
+        "20,50,100",
+        "--device",
+        "cpu",
+        "--attn_implementation",
+        "eager",
+        "--disamb_path",
+        "data_paper_hardened_v2/disamb_pairs.jsonl",
+        "--seed",
+        "0",
+        "--split_seed",
+        "0",
+        "--frac_selection",
+        "0.5",
+        "--bootstrap_B",
+        "1000",
+        "--ci",
+        "0.95",
+        "--out_csv",
+        "$RUN_ROOT/source/topk/gemma3_4b_topk.csv",
+        "--out_summary",
+        "$RUN_ROOT/source/topk/gemma3_4b_topk.summary.json",
+        "--overwrite",
+        "--torch_dtype",
+        "float32",
+        "--local_files_only"
+      ],
+      "artifact_kind": "core",
+      "display_command": "python analysis/aom_clt_topk_recovery.py --model_name_or_path google/gemma-3-4b-pt --revision cc012e0a6d0787b4adcc0fa2c4da74402494554d --tokenizer_revision cc012e0a6d0787b4adcc0fa2c4da74402494554d --clt_repo clt_bundles/sae_writeback_limitation_release --clt_width 16k --layers 4,8 --ks 20,50,100 --logz_ks 20,50,100 --device cpu --attn_implementation eager --disamb_path data_paper_hardened_v2/disamb_pairs.jsonl --seed 0 --split_seed 0 --frac_selection 0.5 --bootstrap_B 1000 --ci 0.95 --out_csv '$RUN_ROOT/source/topk/gemma3_4b_topk.csv' --out_summary '$RUN_ROOT/source/topk/gemma3_4b_topk.summary.json' --overwrite --torch_dtype float32 --local_files_only",
+      "ended_at_utc": "2026-06-16T02:59:26+00:00",
+      "exit_code": 0,
+      "generated_files": [
+        "logs/gemma_3_top_k_source_run.stderr.log",
+        "logs/gemma_3_top_k_source_run.stdout.log",
+        "source/topk/gemma3_4b_topk.csv",
+        "source/topk/gemma3_4b_topk.summary.json",
+        "source/topk/gemma3_4b_topk.summary.manifest.json"
+      ],
+      "name": "Gemma-3 top-k source run",
+      "started_at_utc": "2026-06-16T00:01:58+00:00",
+      "stderr_log": "$RUN_ROOT/logs/gemma_3_top_k_source_run.stderr.log",
+      "stderr_tail": [],
+      "stdout_log": "$RUN_ROOT/logs/gemma_3_top_k_source_run.stdout.log"
+    },
+    {
+      "argv": [],
+      "artifact_kind": "core",
+      "display_command": "internal: derive limitation paper outputs from source summaries",
+      "ended_at_utc": "2026-06-16T02:59:26+00:00",
+      "exit_code": 0,
+      "generated_files": [
+        "derived/limitation_paper_numbers.json",
+        "derived/stress_arm_summary.csv"
+      ],
+      "name": "Derive paper outputs",
+      "started_at_utc": "2026-06-16T02:59:26+00:00",
+      "stderr_log": "",
+      "stderr_tail": [],
+      "stdout_log": ""
+    },
+    {
+      "argv": [],
+      "artifact_kind": "core",
+      "display_command": "internal: build limitation release surface from source_run_root",
+      "ended_at_utc": "2026-06-16T02:59:27+00:00",
+      "exit_code": 0,
+      "generated_files": [
+        "release/figures/centerpiece_summary.svg",
+        "release/figures/topk_summary.svg",
+        "release/results/comparability/l4/comparability.summary.json",
+        "release/results/comparability/l8/comparability.summary.json",
+        "release/results/source/comparability/gemma3_4b_comparability.csv",
+        "release/results/source/comparability/gemma3_4b_comparability.summary.json",
+        "release/results/source/topk/gemma3_4b_topk.summary.json",
+        "release/results/topk/l4/topk.summary.json",
+        "release/results/topk/l8/topk.summary.json",
+        "release/tables/centerpiece_summary.csv",
+        "release/tables/gate_diagnostics_rows.csv",
+        "release/tables/gate_diagnostics_summary.csv",
+        "release/tables/release_manifest.json",
+        "release/tables/robustness_input_case_target.csv",
+        "release/tables/robustness_summary.csv",
+        "release/tables/strict_gate_sensitivity.csv",
+        "release/tables/topk_summary.csv"
+      ],
+      "name": "Build release surface",
+      "started_at_utc": "2026-06-16T02:59:26+00:00",
+      "stderr_log": "",
+      "stderr_tail": [],
+      "stdout_log": ""
+    }
+  ],
+  "requested_device": "cpu"
+}

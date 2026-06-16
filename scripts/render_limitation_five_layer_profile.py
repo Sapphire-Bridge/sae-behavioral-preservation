@@ -89,7 +89,7 @@ def write_csv(rows: list[dict[str, Any]], out_path: Path) -> None:
         "crr_ci_high",
     ]
     with out_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             writer.writerow(

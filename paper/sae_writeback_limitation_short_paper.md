@@ -127,7 +127,7 @@ Figure 1 and Table 1 show the central contrast. L4 and L8 both have very high co
 | SAE | 0.506 | 0.907 |
 | SAE-raw [95% CI] | -0.309 [-0.636, -0.027] | -0.024 [-0.270, 0.224] |
 | CRR | 0.621 | 0.974 |
-| PCA effect | 0.832 | 0.667 |
+| PCA effect | 0.829 | 0.688 |
 
 **Table 1.** L4/L8 comparison from the main summary, rounded to three decimals. `CRR` is computed as mean SAE effect / mean raw effect; the PCA effect row reports an effect, not a CRR. The inferential contrast is the paired `SAE-raw` difference at the same layer-token intervention site, not a comparison of marginal raw and SAE confidence intervals. Full-precision values remain in the release artifacts.
 
@@ -137,9 +137,9 @@ In this comparison, standard fidelity diagnostics do not certify matched behavio
 
 ### 4.1 PCA control
 
-The PCA control is included to test a weak alternative explanation of the layer-4 under-recovery. Perhaps any low-rank projection of the donor-recipient intervention delta would reduce the effect, regardless of sparsity. The comparison does not support that reading. At layer 4, rank-controlled PCA patching sits at `0.832`, essentially at the raw level of `0.815`, while SAE reconstruction patching drops to `0.506`. Rank-controlled PCA therefore does not show the same L4 under-recovery.
+The PCA control is included to test a weak alternative explanation of the layer-4 under-recovery. Perhaps any low-rank projection of the donor-recipient intervention delta would reduce the effect, regardless of sparsity. The comparison does not support that reading. At layer 4, rank-controlled PCA patching sits at `0.829`, essentially at the raw level of `0.815`, while SAE reconstruction patching drops to `0.506`. Rank-controlled PCA therefore does not show the same L4 under-recovery.
 
-At L8, the ordering reverses. SAE remains near raw (`0.907` versus `0.931`), whereas PCA falls to `0.667`. This supports a depth-heterogeneous interpretation of matched-patching preservation, without showing that sparsity is the sole pressure point or that PCA is generally a better substrate.
+At L8, the ordering reverses. SAE remains near raw (`0.907` versus `0.931`), whereas PCA falls to `0.688`. This supports a depth-heterogeneous interpretation of matched-patching preservation, without showing that sparsity is the sole pressure point or that PCA is generally a better substrate.
 
 ### 4.2 Compact top-k subsets
 
