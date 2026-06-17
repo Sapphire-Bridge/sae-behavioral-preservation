@@ -1,0 +1,90 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=0.95in,top=0.78in,bottom=0.88in]{geometry}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{booktabs,longtable,array,calc}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype}
+\usepackage{titlesec}
+\usepackage{xurl}
+\usepackage{hyperref}
+
+\definecolor{linkblue}{HTML}{0B4F8A}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=linkblue,
+  pdfauthor={$author_name$},
+  pdftitle={$title$}
+}
+
+\setlength{\parindent}{1.25em}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+\linespread{1.02}
+\setlist[itemize]{leftmargin=1.35em,itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{leftmargin=1.45em,itemsep=2pt,topsep=4pt}
+\captionsetup{font=small,labelfont=bf}
+\newcounter{none}
+
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{%
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}\else\usebox{\pandoc@box}\fi
+}
+\makeatother
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{0.75em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.65em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.0ex plus 0.6ex minus 0.2ex}{0.9ex}
+\titlespacing*{\subsection}{0pt}{1.6ex plus 0.4ex minus 0.2ex}{0.6ex}
+\titlespacing*{\subsubsection}{0pt}{1.1ex plus 0.3ex minus 0.1ex}{0.4ex}
+
+\let\pandocappendix\appendix
+\renewcommand{\appendix}{%
+  \pandocappendix
+  \renewcommand{\thesection}{Appendix \Alph{section}}%
+}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\begin{document}
+
+\begin{center}
+\rule{\textwidth}{2.2pt}
+\vspace{0.75em}
+
+{\LARGE\bfseries $title$ \par}
+
+\vspace{0.85em}
+\rule{\textwidth}{0.8pt}
+\vspace{1.35em}
+
+{\large\bfseries $author_name$\footnotemark \par}
+$institution$\par
+\vspace{1.2em}
+\end{center}
+\footnotetext{ORCID: \href{$orcid_url$}{$orcid_label$}. Code and artifacts: \href{$code_url$}{$code_label$}.}
+
+\begin{abstract}
+\noindent $abstract$
+\end{abstract}
+
+\vspace{0.6em}
+
+$body$
+
+\end{document}

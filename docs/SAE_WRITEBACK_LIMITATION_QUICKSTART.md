@@ -26,13 +26,16 @@ python scripts/run_limitation_paper.py \
 ## Public Surface
 
 - `paper/sae_writeback_limitation_short_paper.md` (canonical external technical surface)
-- `paper/sae_writeback_limitation_paper.md` (repo/governance-facing claim surface)
+- `paper/templates/arxiv_preprint.tex` and `scripts/render_short_paper_pdf.py` (PDF render surface; run `make paper-pdf`)
+- `paper/sae_writeback_limitation_paper.md` (secondary repo/governance note; not the arXiv manuscript)
+- `data_paper_hardened_v2/disamb_pairs.jsonl` (canonical frozen hardened DISAMB dataset)
 - `results/sae_writeback_limitation_release/comparability/l4/comparability.summary.json`
 - `results/sae_writeback_limitation_release/comparability/l8/comparability.summary.json`
 - `results/sae_writeback_limitation_release/topk/l4/topk.summary.json`
 - `results/sae_writeback_limitation_release/topk/l8/topk.summary.json`
 - `tables/sae_writeback_limitation_release/centerpiece_summary.csv`
 - `tables/sae_writeback_limitation_release/topk_summary.csv`
+- `tables/sae_writeback_limitation_release/strict_gate_sensitivity.csv`
 
 ## Prerequisites
 

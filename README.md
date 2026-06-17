@@ -8,8 +8,8 @@ also preserve that activation's causal effect on model behavior?
 
 The main result is a layer-specific L4/L8 contrast. In Gemma 3 4B, layers 4
 and 8 both show strong standard reconstruction diagnostics. FVU is lower at L8
-than at L4, but the two layers still show very different behavioral recovery
-under matched SAE reconstruction patching:
+than at L4 as a point estimate, but the two layers still show very different
+behavioral recovery under matched SAE reconstruction patching:
 
 | Layer | Cosine | RelMSE | FVU | CRR |
 |-------|-------:|-------:|----:|----:|
@@ -20,7 +20,7 @@ The point is not that SAEs fail in general. The point is that standard
 reconstruction diagnostics do not by themselves certify behavior preservation
 under matched activation patching at a given layer-token intervention site.
 
-Scope is deliberately narrow: one model (Gemma 3 4B), one task (homonym
+Scope is deliberately narrow: one model (Gemma 3 4B), one task (homograph
 disambiguation), 52 paired evaluation cases. The L4/L8 contrast is substantial
 even within this controlled setting.
 
@@ -29,7 +29,7 @@ even within this controlled setting.
   alt="L4/L8 comparison showing strong reconstruction diagnostics but different behavioral recovery under matched SAE reconstruction patching."
 />
 
-*Figure 1. L4 and L8 both show strong reconstruction diagnostics, with lower FVU at L8 than L4, but only L8 shows high recovery of the raw activation-patching effect.*
+*Figure 1. L4 and L8 both show strong reconstruction diagnostics, with lower point-estimate FVU at L8 than L4, but only L8 shows high recovery of the raw activation-patching effect.*
 
 ---
 
@@ -155,6 +155,17 @@ made against the CPU profile.
 Wall time depends on hardware and cache state; expect substantially longer than
 the quickcheck.
 
+## Render the Paper PDF
+
+The arXiv-facing PDF is rendered from the canonical short paper markdown:
+
+```bash
+make paper-pdf
+```
+
+This writes `output/pdf/sae_writeback_limitation_short_paper.pdf` using the
+repo-local arXiv-style template in `paper/templates/arxiv_preprint.tex`.
+
 ---
 
 ## Canonical Artifacts
@@ -162,7 +173,7 @@ the quickcheck.
 | Type | Path |
 |------|------|
 | Paper | `paper/sae_writeback_limitation_short_paper.md` |
-| Evaluation data | `data_paper_hardened_v2/` (52 paired homonym disambiguation cases; pinned bundle) |
+| Evaluation data | `data_paper_hardened_v2/disamb_pairs.jsonl` (canonical frozen hardened DISAMB snapshot; 52 paired homograph disambiguation cases) |
 | L4 results | `results/sae_writeback_limitation_release/comparability/l4/comparability.summary.json` |
 | L8 results | `results/sae_writeback_limitation_release/comparability/l8/comparability.summary.json` |
 | Main table | `tables/sae_writeback_limitation_release/centerpiece_summary.csv` |

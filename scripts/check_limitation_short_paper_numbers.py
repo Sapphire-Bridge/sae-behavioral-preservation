@@ -6,6 +6,7 @@ import csv
 import json
 import re
 import sys
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -19,6 +20,7 @@ import scripts.limitation_requirements as limitation_requirements
 
 
 DEFAULT_PAPER = ROOT / "paper" / "sae_writeback_limitation_short_paper.md"
+DEFAULT_DISAMB_DATASET = ROOT / "data_paper_hardened_v2" / "disamb_pairs.jsonl"
 NUMBER_LITERAL_RE = re.compile(r"(?<![A-Za-z0-9_])[-+]?\d+(?:\.\d+)?%?(?:k)?(?![A-Za-z0-9_])")
 SourceRef = Path | str
 
@@ -47,6 +49,20 @@ def _read_json(path: Path) -> Any:
 def _read_csv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
+
+
+def _read_jsonl(path: Path) -> list[Mapping[str, Any]]:
+    rows: list[Mapping[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for lineno, line in enumerate(handle, start=1):
+            raw = line.strip()
+            if not raw:
+                continue
+            value = json.loads(raw)
+            if not isinstance(value, Mapping):
+                raise ValueError(f"{path}:{lineno} is not a JSON object")
+            rows.append(value)
+    return rows
 
 
 def _fmt3(value: object) -> str:
@@ -182,7 +198,10 @@ def _layer_comparability_check(layer: int, summary: Mapping[str, Any], source: P
         _fmt3(_mean(summary, "pca_effect")),
     )
     if _has_metric(summary, "fidelity_fvu"):
-        literals = literals + (_fmt3(_mean(summary, "fidelity_fvu")),)
+        literals = literals + (
+            _fmt3(_mean(summary, "fidelity_fvu")),
+            _ci_literal(summary, "fidelity_fvu"),
+        )
     if layer in {4, 8}:
         literals = literals + (_fmt_percent1(crr),)
     return LiteralCheck(
@@ -301,6 +320,146 @@ def _robustness_check(row: Mapping[str, str], source: Path) -> LiteralCheck:
     )
 
 
+def _strict_gate_sensitivity_check(strict_source: Path, robustness_source: Path) -> LiteralCheck:
+    strict_rows = _read_csv(strict_source)
+    robustness_rows = _read_csv(robustness_source)
+    l4_strict = _require_csv_row(strict_rows, context="strict-gate L4 row", layer=4)
+    l8_strict = _require_csv_row(strict_rows, context="strict-gate L8 row", layer=8)
+    l4_primary = _require_csv_row(
+        robustness_rows,
+        context="target-level L4 sign-flip",
+        test="target_sign_flip",
+        comparison="l4_sae_minus_raw",
+        layer=4,
+        unit="target",
+    )
+    literals = (
+        f"`{_fmt3(l4_strict['d_CA_mean'])}`",
+        f"[{_fmt3(l4_strict['d_CA_ci_low'])}, {_fmt3(l4_strict['d_CA_ci_high'])}]",
+        f"`p = {_fmt3(l4_strict['target_sign_flip_p_two_sided'])}`",
+        f"`p = {_fmt3(l4_primary['p_two_sided'])}`",
+        f"`{_fmt3(l8_strict['d_CA_mean'])}`",
+        f"`p = {_fmt3(l8_strict['target_sign_flip_p_two_sided'])}`",
+    )
+    return LiteralCheck(
+        label="strict-gate sensitivity literals",
+        literals=literals,
+        sources=(strict_source, robustness_source),
+        note=(
+            "Strict-gate sensitivity values from the public strict-gate table, "
+            "with the governed L4 target sign-flip p-value for comparison."
+        ),
+    )
+
+
+def _strip_choice(value: object) -> str:
+    text = str(value).strip()
+    if not text:
+        raise ValueError("Empty DISAMB continuation choice")
+    return text
+
+
+def _disamb_target_summaries(source: Path = DEFAULT_DISAMB_DATASET) -> list[Mapping[str, Any]]:
+    rows = _read_jsonl(source)
+    if not rows:
+        raise ValueError(f"{source} is empty")
+
+    grouped: OrderedDict[str, dict[str, Any]] = OrderedDict()
+    for row in rows:
+        target = str(row["target"])
+        metadata = row.get("metadata", {})
+        if not isinstance(metadata, Mapping):
+            raise ValueError(f"Missing metadata object for target {target!r}")
+        if metadata.get("variant") != "hardened":
+            raise ValueError(f"Non-hardened DISAMB row in canonical dataset for target {target!r}")
+
+        labels = tuple(str(label) for label in metadata.get("labels", ()))
+        if len(labels) != 2:
+            raise ValueError(f"Expected exactly two labels for target {target!r}, got {labels!r}")
+
+        choices_raw = row.get("choices", {})
+        if not isinstance(choices_raw, Mapping):
+            raise ValueError(f"Missing choices object for target {target!r}")
+        choices = {
+            label: tuple(_strip_choice(item) for item in choices_raw.get(label, ()))
+            for label in labels
+        }
+        if any(len(items) != 3 for items in choices.values()):
+            raise ValueError(f"Expected three continuations per label for target {target!r}")
+
+        pair_variant = str(metadata.get("pair_variant", ""))
+        if target not in grouped:
+            grouped[target] = {
+                "target": target,
+                "labels": labels,
+                "choices": choices,
+                "variants": [],
+            }
+        current = grouped[target]
+        if current["labels"] != labels or current["choices"] != choices:
+            raise ValueError(f"Inconsistent labels or choices for target {target!r}")
+        current["variants"].append(pair_variant)
+
+    expected_variants = {"clean", "distractor", "paraphrase_clean", "paraphrase_distractor"}
+    summaries: list[Mapping[str, Any]] = []
+    for target, summary in grouped.items():
+        observed_variants = set(summary["variants"])
+        if observed_variants != expected_variants:
+            raise ValueError(
+                f"Target {target!r} has variants {sorted(observed_variants)}, "
+                f"expected {sorted(expected_variants)}"
+            )
+        summaries.append(
+            {
+                "target": target,
+                "labels": summary["labels"],
+                "choices": summary["choices"],
+                "n_variants": len(summary["variants"]),
+            }
+        )
+    return summaries
+
+
+def _format_disamb_target_row(summary: Mapping[str, Any]) -> str:
+    target = str(summary["target"])
+    labels = tuple(str(label) for label in summary["labels"])
+    choices = summary["choices"]
+    label_cells = []
+    for label in labels:
+        values = ", ".join(str(choice) for choice in choices[label])
+        label_cells.append(f"{label} ({values})")
+    return f"| {target} | {label_cells[0]} | {label_cells[1]} | {int(summary['n_variants'])} |"
+
+
+def render_disamb_target_table(source: Path = DEFAULT_DISAMB_DATASET) -> str:
+    rows = [
+        "| target | label A continuations | label B continuations | variants |",
+        "|---|---|---|---:|",
+    ]
+    rows.extend(_format_disamb_target_row(summary) for summary in _disamb_target_summaries(source))
+    return "\n".join(rows)
+
+
+def _disamb_hardened_dataset_check(source: Path = DEFAULT_DISAMB_DATASET) -> LiteralCheck:
+    summaries = _disamb_target_summaries(source)
+    n_targets = len(summaries)
+    n_variants = {int(summary["n_variants"]) for summary in summaries}
+    if n_variants != {4}:
+        raise ValueError(f"Expected all DISAMB targets to have four variants, got {sorted(n_variants)}")
+    literals = [
+        "`data_paper_hardened_v2/disamb_pairs.jsonl`",
+        f"{n_targets} targets x 4 variants",
+        "frozen hardened DISAMB snapshot",
+    ]
+    literals.extend(_format_disamb_target_row(summary) for summary in summaries)
+    return LiteralCheck(
+        label="hardened DISAMB appendix literals",
+        literals=tuple(literals),
+        sources=(source,),
+        note="Canonical DISAMB target table generated from data_paper_hardened_v2/disamb_pairs.jsonl.",
+    )
+
+
 def _identity_check() -> LiteralCheck:
     return LiteralCheck(
         label="limitation setting identity literals",
@@ -324,6 +483,7 @@ def _method_surface_check() -> LiteralCheck:
             "margin = expected_label_score - best_other_score",
             "CRR(T | R)",
             "ratio of mean effects",
+            "10^{-6}",
             "donor-directed effect",
             "matched activation patching",
             "layer-token intervention site",
@@ -408,22 +568,31 @@ def _auxiliary_sanity_check(source: Path) -> LiteralCheck:
 
 
 def _external_literature_check() -> LiteralCheck:
-    source = (
+    ameisen_source = (
         "Ameisen et al. 2025, Circuit Tracing: Revealing Computational Graphs in Language Models, "
         "official Transformer Circuits HTML, section 'Evaluating Mechanistic Faithfulness', "
         "lines L1120-L1121, "
         "https://transformer-circuits.pub/2025/attribution-graphs/methods.html"
+    )
+    oh_source = (
+        "Oh et al. 2026, Tug-of-war between idioms' figurative and literal interpretations in LLMs, "
+        "arXiv:2506.01723 / EACL 2026."
     )
     return LiteralCheck(
         label="external literature comparison literals",
         literals=(
             "18-layer model",
             "around 60-80%",
+            "Oh et al. (2026)",
+            "Llama and Qwen",
+            "arXiv:2506.01723",
+            "doi:10.18653/v1/2026.eacl-long.135",
+            "pages 2942-2958",
         ),
-        sources=(source,),
+        sources=(ameisen_source, oh_source),
         note=(
-            "External literature context for the Anthropic comparison; the official source reports "
-            "10m-dictionary cosine faithfulness for 18L around 60-80% one layer downstream."
+            "External literature context for Anthropic circuit tracing and Oh et al.'s "
+            "figurative-literal idiom tracing comparison."
         ),
     )
 
@@ -438,6 +607,10 @@ def build_literal_checks(
     l4_topk_path = limitation_requirements.limitation_topk_summary_path(4, root=results_root)
     l8_topk_path = limitation_requirements.limitation_topk_summary_path(8, root=results_root)
     robustness_path = limitation_requirements.limitation_robustness_summary_table_path(root=tables_root)
+    strict_gate_path = (
+        (tables_root if tables_root is not None else ROOT / "tables" / "sae_writeback_limitation_release")
+        / "strict_gate_sensitivity.csv"
+    )
     five_layer_profile_path = ROOT / "tables" / "sae_writeback_limitation_source" / "abstract_five_layer_profile.csv"
     appendix_a_sanity_path = (
         ROOT / "tables" / "sae_writeback_limitation_release" / "appendix_a_sanity_summary.csv"
@@ -462,6 +635,8 @@ def build_literal_checks(
         _five_layer_context_check(),
         _five_layer_profile_check(five_layer_profile_path),
         _auxiliary_sanity_check(appendix_a_sanity_path),
+        _strict_gate_sensitivity_check(strict_gate_path, robustness_path),
+        _disamb_hardened_dataset_check(),
         _external_literature_check(),
         _release_count_check(
             l4_comp,

@@ -327,7 +327,7 @@ def render_svg(
         svg_text(
             width - right,
             596,
-            "Draft-only profile until promoted into a governed release surface.",
+            "Auxiliary source profile mirrored in Appendix B.",
             size=10,
             anchor="end",
             fill=colors["muted"],
@@ -344,6 +344,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--summary", type=Path, required=True, help="Path to the source comparability summary JSON.")
     parser.add_argument("--out_svg", type=Path, required=True, help="Output SVG path.")
     parser.add_argument("--out_csv", type=Path, default=None, help="Optional output CSV path with the plotted values.")
+    parser.add_argument("--source_label", type=str, default=None, help="Optional source label rendered in the SVG footer.")
     parser.add_argument("--layers", type=str, default="4,5,8,11,16", help="Comma-separated layer list.")
     parser.add_argument(
         "--title",
@@ -370,7 +371,7 @@ def main() -> None:
         args.out_svg,
         title=str(args.title),
         subtitle=str(args.subtitle),
-        source_label=str(args.summary),
+        source_label=str(args.source_label or args.summary),
     )
     if args.out_csv is not None:
         write_csv(rows, args.out_csv)

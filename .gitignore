@@ -98,6 +98,9 @@ docs/context/
 # Generated figure outputs (reproduced by make limitation-reproduce)
 figures/*.pdf
 
+# Local render outputs
+output/
+
 # Internal working docs (not part of the public supplement)
 docs/ARCHIVAL_RELEASE_MODEL.md
 docs/CLT_V1.md

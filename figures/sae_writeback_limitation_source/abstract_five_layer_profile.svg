@@ -120,6 +120,6 @@
 <line x1="360.0" y1="568.0" x2="386.0" y2="568.0" stroke="#dc2626" stroke-width="2.4"/>
 <rect x="374.0" y="563.0" width="10" height="10" fill="#dc2626" stroke="#ffffff" stroke-width="1.2"/>
 <text x="398.0" y="572.0" font-size="11" font-family="Helvetica, Arial, sans-serif" font-weight="normal" text-anchor="start" fill="#1f1f1f">SAE effect</text>
-<text x="90.0" y="596.0" font-size="10" font-family="Helvetica, Arial, sans-serif" font-weight="normal" text-anchor="start" fill="#78716c">Source: /tmp/sae_limitation_cpu_fvu_v2/source/comparability/gemma3_4b_comparability.summary.json</text>
-<text x="870.0" y="596.0" font-size="10" font-family="Helvetica, Arial, sans-serif" font-weight="normal" text-anchor="end" fill="#78716c">Draft-only profile until promoted into a governed release surface.</text>
+<text x="90.0" y="596.0" font-size="10" font-family="Helvetica, Arial, sans-serif" font-weight="normal" text-anchor="start" fill="#78716c">Source: results/sae_writeback_limitation_release/source/comparability/gemma3_4b_comparability.summary.json</text>
+<text x="870.0" y="596.0" font-size="10" font-family="Helvetica, Arial, sans-serif" font-weight="normal" text-anchor="end" fill="#78716c">Auxiliary source profile mirrored in Appendix B.</text>
 </svg>

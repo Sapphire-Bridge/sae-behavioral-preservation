@@ -1,8 +1,10 @@
 # Evaluation data
 
 The canonical evaluation dataset for the SAE behavioral preservation result is
-`data_paper_hardened_v2/disamb_pairs.jsonl` (52 paired homonym disambiguation
-cases). The schema below documents the `.jsonl` format.
+`data_paper_hardened_v2/disamb_pairs.jsonl` (52 paired homograph disambiguation
+cases). Files under `data/` are retained only for legacy compatibility; paper
+claims should cite the hardened snapshot path above. The schema below documents
+the `.jsonl` format.
 
 ## Disambiguation pairs (`disamb_pairs.jsonl`)
 

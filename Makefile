@@ -1,4 +1,4 @@
-.PHONY: check limitation-check limitation-assets limitation-reproduce limitation-reproduce-verify limitation-number-check limitation-one-result-check limitation-one-result-check-gpu limitation-one-result limitation-one-result-gpu limitation-reviewer-check-gpu
+.PHONY: check paper-pdf limitation-check limitation-assets limitation-reproduce limitation-reproduce-verify limitation-number-check limitation-one-result-check limitation-one-result-check-gpu limitation-one-result limitation-one-result-gpu limitation-reviewer-check-gpu
 
 PYTHON ?= $(shell command -v python3.11 >/dev/null 2>&1 && echo python3.11 || echo python3)
 VENV ?= .venv
@@ -21,6 +21,9 @@ $(DEPS_STAMP): requirements.txt | $(VENV_PYTHON)
 
 check: $(DEPS_STAMP)
 	$(VENV_PYTHON) -m pytest -q
+
+paper-pdf:
+	$(PYTHON) scripts/render_short_paper_pdf.py
 
 limitation-check: $(DEPS_STAMP)
 	$(VENV_PYTHON) -m pytest -q tests/test_limitation_release_surface.py tests/test_limitation_short_paper_numbers.py
