@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -14,6 +15,11 @@ DEFAULT_PAPER = ROOT / "paper" / "sae_writeback_limitation_short_paper.md"
 DEFAULT_TEMPLATE = ROOT / "paper" / "templates" / "arxiv_preprint.tex"
 DEFAULT_OUT = ROOT / "output" / "pdf" / "sae_writeback_limitation_short_paper.pdf"
 DEFAULT_INTERMEDIATE = ROOT / "tmp" / "pdfs" / "sae_writeback_limitation_short_paper.arxiv.md"
+MAIN_EFFECT_SVG_REF = "../figures/sae_writeback_limitation/main_effect_figure.svg"
+MAIN_EFFECT_SVG = ROOT / "figures" / "sae_writeback_limitation" / "main_effect_figure.svg"
+MAIN_EFFECT_PNG_REF = "assets/main_effect_figure_2x.png"
+MAIN_EFFECT_PNG_WIDTH = "3600"
+MAIN_EFFECT_PNG_HEIGHT = "1960"
 
 
 FIELD_RE = re.compile(r"^\*\*(?P<name>Author|Institution|ORCID|Code and artifacts):\*\*\s*(?P<value>.*)$")
@@ -137,6 +143,50 @@ def build_render_markdown(source: Path) -> str:
     return "\n".join([*yaml_lines, "", *normalized_body, ""])
 
 
+def _relative_to_root(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def _render_main_effect_png(intermediate_dir: Path) -> Path:
+    converter = shutil.which("rsvg-convert")
+    if converter is None:
+        raise RuntimeError(
+            "rsvg-convert is required to render the arXiv PDF without Type-3 fonts in Figure 1. "
+            "Install librsvg, for example with `brew install librsvg`."
+        )
+    if not MAIN_EFFECT_SVG.exists():
+        raise FileNotFoundError(f"Missing Figure 1 source SVG: {MAIN_EFFECT_SVG}")
+
+    png_path = intermediate_dir / MAIN_EFFECT_PNG_REF
+    png_path.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        converter,
+        "-f",
+        "png",
+        "-w",
+        MAIN_EFFECT_PNG_WIDTH,
+        "-h",
+        MAIN_EFFECT_PNG_HEIGHT,
+        "-o",
+        str(png_path),
+        str(MAIN_EFFECT_SVG),
+    ]
+    subprocess.run(cmd, cwd=ROOT, check=True)
+    return png_path
+
+
+def _prepare_render_markdown(source: Path, intermediate_dir: Path) -> str:
+    markdown = build_render_markdown(source)
+    ref_count = markdown.count(MAIN_EFFECT_SVG_REF)
+    if ref_count != 1:
+        raise ValueError(f"Expected exactly one Figure 1 SVG reference, found {ref_count}.")
+    _render_main_effect_png(intermediate_dir)
+    return markdown.replace(MAIN_EFFECT_SVG_REF, MAIN_EFFECT_PNG_REF)
+
+
 def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Render the short paper with the arXiv-style preprint template.")
     parser.add_argument("--paper", type=Path, default=DEFAULT_PAPER, help="Canonical short-paper markdown.")
@@ -155,7 +205,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parse_args(argv)
     args.intermediate.parent.mkdir(parents=True, exist_ok=True)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.intermediate.write_text(build_render_markdown(args.paper), encoding="utf-8")
+    args.intermediate.write_text(
+        _prepare_render_markdown(args.paper, args.intermediate.parent),
+        encoding="utf-8",
+    )
+
+    resource_path = ":".join(
+        [
+            ".",
+            "paper",
+            "figures",
+            "figures/sae_writeback_limitation",
+            _relative_to_root(args.intermediate.parent),
+        ]
+    )
 
     cmd = [
         "pandoc",
@@ -166,7 +229,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--pdf-engine=tectonic",
         "--template",
         str(args.template),
-        "--resource-path=.:paper:figures:figures/sae_writeback_limitation",
+        f"--resource-path={resource_path}",
         "-o",
         str(args.out),
     ]
