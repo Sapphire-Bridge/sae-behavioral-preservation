@@ -11,6 +11,10 @@
 | `run_limitation_paper.py` | `make limitation-reproduce` |
 | `verify_limitation_reproduce.py` | `make limitation-reproduce-verify` |
 
+## Exploratory extensions
+
+- `prepare_garden_path_pairs.py` — converts garden-path triples into DisambPair JSONL for `clt_raw_comparability.py`; see `docs/garden_path_crr.md`
+
 ## Supporting modules (not called directly)
 
 - `limitation_surface.py` — public comparability summary schema and build logic

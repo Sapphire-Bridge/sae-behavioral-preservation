@@ -137,3 +137,7 @@ release_public/
 release_minimal_publish_bundle/
 replication_bundle/
 reviewer_check_logs/
+
+# Garden-path extension: converted third-party data is not vendored
+data_garden_path/
+runs/garden_path/

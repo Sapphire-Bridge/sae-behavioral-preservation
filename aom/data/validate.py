@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import string
 from typing import Mapping, Sequence
 
 from .schemas import DisambPair
+
+# Punctuation attaches to the preceding word without a space (e.g. "the bill" + ","),
+# so a punctuation-led continuation is a valid boundary, unlike a bare word.
+_ATTACHING_PUNCTUATION = frozenset(string.punctuation)
 
 
 def _validate_prompt_cont_boundary(*, prompt: str, continuation: str, item_id: str, field: str) -> None:
@@ -10,6 +15,8 @@ def _validate_prompt_cont_boundary(*, prompt: str, continuation: str, item_id: s
         raise ValueError(f"{item_id}: empty prompt/context for {field}")
     if not continuation:
         raise ValueError(f"{item_id}: empty continuation in {field}")
+    if continuation[0] in _ATTACHING_PUNCTUATION:
+        return
     if (not prompt[-1].isspace()) and (not continuation[0].isspace()):
         raise ValueError(
             f"{item_id}: continuation boundary likely wrong in {field} "
